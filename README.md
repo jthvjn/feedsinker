@@ -34,12 +34,12 @@ $ mix setup
 
 ####  Architecture
 1. Application starts
-    [a] Repo
-    [b] Task Supervisor
-    [c] calls a fn to add to Task Supervisor - [1]
+    - Repo
+    - Task Supervisor
+    - calls a fn to add to Task Supervisor - [1]
 
 2. Fn to add to Task Supervisor [1]
-    [a] Adds a supervised task for each feed  source with transient restart - [2]
+    - Adds a supervised task for each feed  source with transient restart - [2]
 
 3. [2] starts tasks to download the feed from the source at mentioned interval with temporary restart - [3]
 
