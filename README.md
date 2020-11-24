@@ -26,13 +26,13 @@ Requirements
      user: postgres, password: postgres
 3. Redis: 
     No password
-4. Check config/congig.exs
+4. Check config/config.exs
 
 To setup the project:
-$ mix setup
+ $ mix setup
 
 To start
-$ mix run --no-halt
+ $ mix run --no-halt
 
 
 ####  Architecture
