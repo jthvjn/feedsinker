@@ -28,10 +28,10 @@ Requirements
     No password
 4. Check config/config.exs
 
-To setup the project:
+To setup the project: <br>
  $ mix setup
 
-To start
+To start: <br>
  $ mix run --no-halt
 
 
