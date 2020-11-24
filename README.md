@@ -20,7 +20,7 @@ and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
 be found at [https://hexdocs.pm/feed_sinker](https://hexdocs.pm/feed_sinker).
 
 
-Requirements
+#### Requirements
 1. Elixir
 2. Postgres: 
      user: postgres, password: postgres
@@ -28,10 +28,10 @@ Requirements
     No password
 4. Check config/config.exs
 
-To setup the project: <br>
+#### To setup the project: 
  $ mix setup
 
-To start: <br>
+#### To start: 
  $ mix run --no-halt
 
 
