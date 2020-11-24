@@ -31,6 +31,9 @@ Requirements
 To setup the project:
 $ mix setup
 
+To start
+$ mix run --no-halt
+
 
 ####  Architecture
 1. Application starts
