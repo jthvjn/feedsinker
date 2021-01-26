@@ -1,6 +1,8 @@
 defmodule FeedSink do
   @moduledoc """
   Documentation for `FeedSink`.
+
+  Check `FeedSourceAdapter` for more defining new adapter.
   """
   require Logger
   use Task
@@ -13,6 +15,10 @@ defmodule FeedSink do
     recv_timeout: 5_000
   ]
 
+  @doc """
+    Adds a feed downloader for each source mention in `config.exs` under a supervisor
+    with `restart: :transient`.
+  """
   def start() do
     IO.puts("\n
     ########################################
@@ -35,15 +41,18 @@ defmodule FeedSink do
     end)
   end
 
+  @doc """
+    Starts a `feed sinker` process at every mentioned time intervals with `restart: :temporary`.
+    The `feed sinker` process, downloads, normalize with the corresponding adapter, and pushes the
+    data to `ExQ` for persistance. Data correctness is checked during normalization with the `Feed` schems.
+  """
   def start_feed_sinker_for_source(source, url, request_interval) do
-    Task.start(__MODULE__, :get_and_save_feed_normalized, [url, source])
+    Task.start(__MODULE__, :feed_sinker_for_source, [url, source])
     Process.sleep(request_interval)
     start_feed_sinker_for_source(source, url, request_interval)
   end
 
-  def get_and_save_feed_normalized(url, source) do
-    Logger.info("Starting feed downloading for #{source} at #{DateTime.utc_now()}")
-
+  def feed_sinker_for_source(url, source) do
     url
     |> get_feeds_from(source)
     |> log_status(:download_job, source)
@@ -54,6 +63,8 @@ defmodule FeedSink do
   end
 
   defp get_feeds_from(url, source) do
+    Logger.info("Starting feed downloading for #{source} at #{DateTime.utc_now()}")
+
     with {:ok, response = %HTTPoison.Response{}} <- HTTPoison.get(url, @headers, @options),
          {:ok, response_} <- Jason.decode(response.body) do
       Logger.info("[#{__MODULE__}][Feed downloading][Success][#{source}][#{url}]}")
