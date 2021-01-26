@@ -5,18 +5,20 @@ defmodule FeedSink.Feed do
   @fields [:home_team, :away_team, :source, :kickoff_at, :created_at]
   @required_fields @fields
 
+  @derive  {Jason.Encoder, only: @fields}
+
   schema "feeds" do
     field :home_team, :string
     field :away_team, :string
     field :source, :string
-    field :kickoff_at, :utc_datetime
+    field :kickoff_at, :utc_datetime, nil: :true
     field :created_at, :utc_datetime
 
     timestamps()
   end
 
-  def changeset(feed, params \\ %{}) do
-    feed
+  def changeset(params \\ %{}) do
+    %__MODULE__{}
     |> cast(params, @fields)
     |> validate_required(@required_fields)
   end
@@ -31,8 +33,8 @@ defmodule FeedSink.Feed do
   end
 
   def insert(params) do
-    %__MODULE__{}
-    |> changeset(params)
+    params
+    |> changeset()
     |> FeedSink.Repo.insert()
   end
 end

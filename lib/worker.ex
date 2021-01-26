@@ -2,7 +2,7 @@ defmodule FeedSink.Worker do
   @moduledoc """
     Worker to persist data.
   """
-  alias FeedSink.{Repo, Feed}
+  alias FeedSink.{Repo, Feed, Helper}
   require Logger
 
   def perform([], _) do
@@ -10,7 +10,7 @@ defmodule FeedSink.Worker do
   end
 
   def perform(feeds, source) do
-    last_updated_timestamp = FeedSink.get_last_updated_timestamp_for(source)
+    last_updated_timestamp = Helper.get_last_updated_timestamp_for(source)
     feeds
     |> Enum.reduce_while(
       last_updated_timestamp,
@@ -25,7 +25,7 @@ defmodule FeedSink.Worker do
 
         if is_new_feed?(created_at_formatted, latest_timestamp) do
           with {:ok, _ } <- Feed.insert(feed) do
-            FeedSink.update_last_updated_timestamp_for(source, created_at_formatted)
+            Helper.update_last_updated_timestamp_for(source, created_at_formatted)
             Logger.info("[#{__MODULE__}] Added to DB #{inspect feed}")
             {:cont, created_at_formatted}
           else
@@ -43,12 +43,6 @@ defmodule FeedSink.Worker do
     case DateTime.compare(feed_timestamp, last_updated_time_stamp) do
       :lt -> false
       _   -> true
-    end
-  end
-
-  defp get_datetime_formatted(datetime_as_iso8601_string) do
-    with {:ok, datetime, _} <- DateTime.from_iso8601(datetime_as_iso8601_string) do
-
     end
   end
 end
