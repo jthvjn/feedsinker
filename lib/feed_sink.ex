@@ -103,7 +103,7 @@ defmodule FeedSink do
     end
   end
 
-  defp add_normalized_feeds_to_sink({:error, error, source}), do: error
+  defp add_normalized_feeds_to_sink(error), do: error
 
   defp log_status(status, from, feed_source) do
     log(status, from, feed_source)
@@ -151,7 +151,7 @@ defmodule FeedSink do
 
   defp log({:error, _, _}, :download_job, source),
     do:
-      Logger.info(
+      Logger.error(
         "#{__MODULE__} [Feed downloading][Failed] Feed downloading from #{source} at #{
           inspect(DateTime.utc_now())
         }"
