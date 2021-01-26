@@ -1,5 +1,4 @@
 defmodule FeedSink.Helper do
-
   require Logger
 
   def from_iso8601(datetime_string) do
@@ -7,7 +6,7 @@ defmodule FeedSink.Helper do
       datetime
     else
       _ = error ->
-        Logger.error("#{__MODULE__} datetime_string cause #{inspect error}")
+        Logger.error("#{__MODULE__} datetime_string cause #{inspect(error)}")
 
         nil
     end
@@ -39,14 +38,16 @@ defmodule FeedSink.Helper do
     Application.fetch_env!(:feed_sinker, :sources)
     |> Keyword.keys()
     |> Enum.each(fn source ->
-        timestamp =
-          case FeedSink.Feed.last_updated_timestamp(source) do
-            nil ->
-              DateTime.new!(~D[0001-01-01], ~T[00:00:00.000], "Etc/UTC")
-            t ->
-              t
-          end
-          update_last_updated_timestamp_for(source, timestamp)
-      end)
+      timestamp =
+        case FeedSink.Feed.last_updated_timestamp(source) do
+          nil ->
+            DateTime.new!(~D[0001-01-01], ~T[00:00:00.000], "Etc/UTC")
+
+          t ->
+            t
+        end
+
+      update_last_updated_timestamp_for(source, timestamp)
+    end)
   end
 end

@@ -15,7 +15,8 @@ config :exq,
   shutdown_timeout: 5000,
   start_on_application: true,
   dead_max_jobs: 10_000,
-  dead_timeout_in_seconds: 1 * 24 * 60 * 60 # 1 day
+  # 1 day
+  dead_timeout_in_seconds: 1 * 24 * 60 * 60
 
 config :feed_sinker,
   ecto_repos: [FeedSink.Repo]

@@ -20,7 +20,7 @@ defmodule FeedSink.Application do
 
     return_val = Supervisor.start_link(children, opts)
 
-    FeedSink.start
+    FeedSink.start()
 
     return_val
   end

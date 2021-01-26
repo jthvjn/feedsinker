@@ -11,6 +11,7 @@ defmodule FeedSink.Worker do
 
   def perform(feeds, source) do
     last_updated_timestamp = Helper.get_last_updated_timestamp_for(source)
+
     feeds
     |> Enum.reduce_while(
       last_updated_timestamp,
@@ -24,25 +25,26 @@ defmodule FeedSink.Worker do
           |> Map.put("kickoff_at", kickoff_at_formatted)
 
         if is_new_feed?(created_at_formatted, latest_timestamp) do
-          with {:ok, _ } <- Feed.insert(feed) do
+          with {:ok, _} <- Feed.insert(feed) do
             Helper.update_last_updated_timestamp_for(source, created_at_formatted)
-            Logger.info("[#{__MODULE__}] Added to DB #{inspect feed}")
+            Logger.info("#{__MODULE__} [Db insert][Success] #{inspect(feed)}")
             {:cont, created_at_formatted}
           else
             {:error, _} ->
-              Logger.error("[#{__MODULE__}] Failed to add to DB #{inspect feed}")
+              Logger.error("#{__MODULE__} [Db insert][Failed] #{inspect(feed)}")
               {:halt, created_at_formatted}
           end
         else
           {:cont, latest_timestamp}
         end
-      end)
+      end
+    )
   end
 
   defp is_new_feed?(feed_timestamp, last_updated_time_stamp) do
     case DateTime.compare(feed_timestamp, last_updated_time_stamp) do
       :lt -> false
-      _   -> true
+      _ -> true
     end
   end
 end
