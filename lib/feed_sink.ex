@@ -89,7 +89,18 @@ defmodule FeedSink do
   defp normalize_feeds(error), do: error
 
   defp add_normalized_feeds_to_sink({:ok, normalized_feeds, source}) do
-    Exq.enqueue(Exq, "feed_sink", FeedSink.Worker, [normalized_feeds, source])
+    with {:ok, jid} <- Exq.enqueue(Exq, "feed_sink", FeedSink.Worker, [normalized_feeds, source]) do
+      {:ok, jid, source}
+    else
+      {:error, reason} ->
+        Logger.error(
+          "#{__MODULE__} [Feed sink queued][Failed][Feed sink] with reason #{inspect(reason)} for #{
+            inspect(normalized_feeds)
+          }"
+        )
+
+        {:error, reason, source}
+    end
   end
 
   defp add_normalized_feeds_to_sink({:error, error, source}), do: error
@@ -100,14 +111,11 @@ defmodule FeedSink do
     status
   end
 
-  defp log({:ok, jid}, :enqueue_job, source),
+  defp log({:ok, jid, _}, :enqueue_job, source),
     do: Logger.info("#{__MODULE__} [Feed sink queued][Success] with JID #{inspect(jid)}")
 
-  defp log({:error, reason}, :enqueue_job, source),
-    do:
-      Logger.info(
-        "#{__MODULE__} [Feed sink queued][Failed][Feed sink] with reason #{inspect(reason)}"
-      )
+  defp log({:error, reason, _}, :enqueue_job, source),
+    do: Logger.error("#{__MODULE__} [Feed sink queued][Failed][Feed sink]")
 
   defp log({:ok, pid}, :start_downloader, source),
     do:

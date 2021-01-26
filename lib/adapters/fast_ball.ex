@@ -56,7 +56,7 @@ defmodule FeedSink.Adapters.FastBall do
   end
 
   def normalize(feeds_received) do
-    Logger.error("#{__MODULE__}Normalize][Failed][Invalid format] #{inspect(feeds_received)}")
-    {:error, "#{__MODULE__}  #{inspect(feeds_received)}", @source}
+    Logger.error("#{__MODULE__} [Normalize][Failed] #{inspect(feeds_received)}")
+    {:error, "#{__MODULE__} #{inspect(feeds_received)}", @source}
   end
 end
