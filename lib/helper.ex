@@ -14,16 +14,15 @@ defmodule FeedSink.Helper do
 
   def get_last_updated_timestamp_for(source) when is_atom(source) do
     case :ets.lookup(:last_updated_timestamp_table, source) do
-      [] -> []
+      [] -> FeedSink.Feed.last_updated_timestamp(source)
       [{_key, last_updated_timestamp}] -> last_updated_timestamp
     end
   end
 
   def get_last_updated_timestamp_for(source) when is_binary(source) do
-    case :ets.lookup(:last_updated_timestamp_table, String.to_atom(source)) do
-      [] -> []
-      [{_key, last_updated_timestamp}] -> last_updated_timestamp
-    end
+    source
+    |> String.to_atom()
+    |> get_last_updated_timestamp_for
   end
 
   def update_last_updated_timestamp_for(source, last_updated_timestamp) when is_atom(source) do
@@ -31,7 +30,9 @@ defmodule FeedSink.Helper do
   end
 
   def update_last_updated_timestamp_for(source, last_updated_timestamp) when is_binary(source) do
-    :ets.insert(:last_updated_timestamp_table, {String.to_atom(source), last_updated_timestamp})
+    source
+    |> String.to_atom()
+    |> update_last_updated_timestamp_for(last_updated_timestamp)
   end
 
   def set_last_updated_timestamps do
